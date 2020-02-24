@@ -82,7 +82,7 @@ var UIController = (function() {
 
                 type: document.querySelector(DOMstrings.inputType).value, // will be inc or exp
                 description: document.querySelector(DOMstrings.inputDescription).value,
-                value: document.querySelector(DOMstrings.inputValue).value
+                value: parseFloat(document.querySelector(DOMstrings.inputValue).value)
 
             };
         },
@@ -108,10 +108,10 @@ var UIController = (function() {
             document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
         },
 
-        clearFields: function(obj, type) {
+        clearFields: function(obj,type) {
             var fields, fieldsArr; 
 
-            document.querySelectorAll(DOMstrings.inputDescription + ', ' + DOMstrings.inputValue); 
+            fields = document.querySelectorAll(DOMstrings.inputDescription + ', ' + DOMstrings.inputValue); 
 
             fieldsArr = Array.prototype.slice.call(fields);
 
@@ -120,9 +120,7 @@ var UIController = (function() {
             });
 
             fieldsArr[0].focus();
-
-        }
-
+        },
         
         //pass the DOMstrings to public so we can call in Global App Controller
         getDOMstrings: function() {
@@ -148,8 +146,18 @@ var controller = (function(budgetCtrl, UICtrl) {
             if (event.keyCode === 13 || event.which === 13) {
                 ctrlAddItem ();
             }
-
         });
+    };
+
+    var updateBudget = function() {
+
+        // 1. calculate the budget
+
+        // 2. return the budget
+
+        // 3. display the budget on the UI
+        
+
     };
 
     var ctrlAddItem = function() {
@@ -168,11 +176,8 @@ var controller = (function(budgetCtrl, UICtrl) {
         // 4. Clear the fields
         UICtrl.clearFields();
 
-        // 4. calculate the budget
-
-
-        // 5. display the budget on the UI
-        
+        // 5. Calculate and update budget
+        updateBudget();
 
     };
 
