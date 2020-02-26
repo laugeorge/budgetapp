@@ -18,7 +18,7 @@ var budgetController = (function() {
         }
     };
 
-    Expense.prototype.getPercentages = function() {
+    Expense.prototype.getPercentage = function() {
 
         return this.percentage;
     };
@@ -127,8 +127,8 @@ var budgetController = (function() {
 
         getPercentages: function() {
 
-            var allPerc = data.allItems.exp.map(function() {
-                return cur.getPercentages();
+            var allPerc = data.allItems.exp.map(function(cur) {
+                return cur.getPercentage();
             });
 
             return allPerc;
@@ -171,8 +171,29 @@ var UIController = (function() {
         expensesLabel: '.budget__expenses--value',
         percentageLabel: '.budget__expenses--percentage',
         container: '.container',
-        expensesPercLabel: '.item__percentage'
+        expensesPercLabel: '.item__percentage',
+        dateLabel: '.budget__title--month',
 
+    };
+
+    var formatNumber = function(num,type) {
+        var numSplit, int, dec; 
+
+        /* + or - before number, 2 decimial points format */
+        num = Math.abs(num);
+        num = num.toFixed(2);
+
+        numSplit = num.split('.')
+
+        int = numSplit[0];
+        if (int.length > 3) {
+            int = int.substr(0, int.length - 3) + ',' + int.substr(int.length - 3, 3); //input 23510, output 23,510
+        }
+
+        dec = numSplit[1];
+
+        return (type === 'exp' ? '-' : '+') + ' ' + int + '.' + dec;
+        
     };
 
     return {
@@ -202,7 +223,7 @@ var UIController = (function() {
             // Replace the placeholder text w/ some actual data
             newHtml = html.replace('%id%', obj.id);
             newHtml = newHtml.replace('%description%', obj.description)
-            newHtml = newHtml.replace('%value%', obj.value)
+            newHtml = newHtml.replace('%value%', formatNumber(obj.value, type));
 
             //Insert the HTML into the DOM
             document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
@@ -231,10 +252,13 @@ var UIController = (function() {
 
         // displaying the budget
         displayBudget: function(obj) {
+            
+            var type;
+            obj.budget > 0 ? type = 'inc' : type = 'exp';
 
-            document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget;
-            document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalInc;
-            document.querySelector(DOMstrings.expensesLabel).textContent = obj.totalExp;
+            document.querySelector(DOMstrings.budgetLabel).textContent = formatNumber(obj.budget, type);
+            document.querySelector(DOMstrings.incomeLabel).textContent = formatNumber(obj.totalInc, 'inc');
+            document.querySelector(DOMstrings.expensesLabel).textContent = formatNumber(obj.totalExp, 'exp');
             
             if (obj.percentage > 0) {
 
@@ -268,6 +292,19 @@ var UIController = (function() {
                     current.textContent = '---';
                 }
             });
+        },
+
+        displayMonth: function() {
+            var now, month, months year;
+
+            now = new Date();
+            //var christmas = new Date(2016, 12, 25);
+            months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 
+            'September', 'October', 'November', 'December'];
+            month = now.getMonth();
+
+            year = now.getFullYear();
+            document.querySelector(DOMstring.dateLabel).textContent = month + '' + year;
 
         },
 
@@ -277,7 +314,6 @@ var UIController = (function() {
         }
 
     };
-
 }) ();
 
 
@@ -310,7 +346,7 @@ var controller = (function(budgetCtrl, UICtrl) {
 
         // 3. update UI w/ new percentage
         console.log(percentages);
-        //UICtrl.displayPercentages(percentages);
+        UICtrl.displayPercentages(percentages);
         
     }
 
@@ -380,6 +416,7 @@ var controller = (function(budgetCtrl, UICtrl) {
     return {
         init: function() {
             console.log('applciation starting');
+            UICtrl.displayMonth();
             UICtrl.displayBudget({
                 budget: 0,
                 totalInc: 0,
